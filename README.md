@@ -1,1 +1,1 @@
-# SalmonTrout_classification
+# Salmon Trout classification
