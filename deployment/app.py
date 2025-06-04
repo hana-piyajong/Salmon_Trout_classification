@@ -15,7 +15,7 @@ class_map = {0: "Salmon", 1: "Trout"}
 def load_model():
     model = models.resnet34(pretrained=False)
     model.fc = torch.nn.Linear(model.fc.in_features, 2)  # 2 classes
-    model.load_state_dict(torch.load("deployment/resnet34_fold4.pth", map_location=torch.device("cpu")))
+    model.load_state_dict(torch.load("deployment/resnet34_fold4_15epoch.pth", map_location=torch.device("cpu")))
     model.eval()
     return model
 
