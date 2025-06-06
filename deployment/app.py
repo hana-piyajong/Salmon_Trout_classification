@@ -5,7 +5,6 @@ from PIL import Image
 from torchvision import models
 import os
 import torch.nn.functional as F
-import random
 import io
 
 class_map = {0: "Salmon", 1: "Trout"}
@@ -36,16 +35,16 @@ st.markdown("Upload your own image **or** choose a sample image below:")
 uploaded_file = st.file_uploader("Upload a fish image", type=["jpg", "jpeg", "png"])
 
 sample_dir = "deployment/sample_images"
-sample_filenames = ["salmon_1.jpg", "salmon_2.jpg", "trout_1.jpg", "trout_2.jpg"]
-random.shuffle(sample_filenames)
+sample_filenames = ["salmon_1.jpg", "trout_1.jpg", "salmon_2.jpg", "trout_2.jpg"]
 
 st.markdown("### Sample Images:")
 selected_sample = None
 cols = st.columns(len(sample_filenames))
 
+# Show sample images with same size and buttons
 for i, filename in enumerate(sample_filenames):
     img_path = os.path.join(sample_dir, filename)
-    image = Image.open(img_path)
+    image = Image.open(img_path).convert("RGB").resize((150, 150))  # resize for uniform display
     cols[i].image(image, use_container_width=True)
     if cols[i].button("Choose", key=filename):
         selected_sample = img_path
