@@ -4,10 +4,9 @@ import torchvision.transforms as transforms
 from PIL import Image
 from torchvision import models
 import os
-import torch.nn.functional as F 
+import torch.nn.functional as F
+import random
 
-
-# Class map
 class_map = {0: "Salmon", 1: "Trout"}
 
 # Load model
@@ -21,7 +20,7 @@ def load_model():
 
 model = load_model()
 
-# Transform image
+# Transform
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -29,13 +28,24 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-# Streamlit UI
+# UI
 st.title("Fish Classifier: Salmon or Trout?")
+st.markdown("Upload your own image **or** select one of our sample images below.")
+
+sample_dir = "sample_images"
+sample_filenames = ["salmon_1.jpg", "salmon_2.jpg", "trout_1.jpg", "trout_2.jpg"]
+random.shuffle(sample_filenames)
+
+selected_sample = st.selectbox("Choose a sample image (optional):", ["None"] + sample_filenames, format_func=lambda x: "Sample Image" if x != "None" else "None")
+
 uploaded_file = st.file_uploader("Upload a fish image", type=["jpg", "jpeg", "png"])
+
+if uploaded_file is None and selected_sample != "None":
+    uploaded_file = open(os.path.join(sample_dir, selected_sample), "rb")
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    st.image(image, caption="Input Image", use_column_width=True)
 
     img_tensor = transform(image).unsqueeze(0)  # Add batch dim
 
