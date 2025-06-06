@@ -6,6 +6,7 @@ from torchvision import models
 import os
 import torch.nn.functional as F
 import random
+import io
 
 class_map = {0: "Salmon", 1: "Trout"}
 
@@ -20,7 +21,7 @@ def load_model():
 
 model = load_model()
 
-# Transform
+# transform
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -30,29 +31,32 @@ transform = transforms.Compose([
 
 # UI
 st.title("Fish Classifier: Salmon or Trout?")
-st.markdown("Upload your own image **or** select one of our sample images below.")
-
-sample_dir = os.path.join("deployment", "sample_images")
-sample_filenames = ["salmon_1.jpg", "salmon_2.jpg", "trout_1.jpg", "trout_2.jpg"]
-random.shuffle(sample_filenames)
-
-selected_sample = st.selectbox(
-    "Choose a sample image (optional):",
-    ["None"] + sample_filenames,
-    format_func=lambda x: x if x == "None" else f"Sample: {x}"
-)
+st.markdown("Upload your own image **or** choose a sample image below:")
 
 uploaded_file = st.file_uploader("Upload a fish image", type=["jpg", "jpeg", "png"])
 
-image = None
+sample_dir = "deployment/sample_images"
+sample_filenames = ["salmon_1.jpg", "salmon_2.jpg", "trout_1.jpg", "trout_2.jpg"]
+random.shuffle(sample_filenames)
 
-if uploaded_file is None and selected_sample != "None":
-    image_path = os.path.join(sample_dir, selected_sample)
-    image = Image.open(image_path).convert("RGB")
-elif uploaded_file is not None:
+st.markdown("### Sample Images:")
+selected_sample = None
+cols = st.columns(len(sample_filenames))
+
+for i, filename in enumerate(sample_filenames):
+    img_path = os.path.join(sample_dir, filename)
+    image = Image.open(img_path)
+    cols[i].image(image, use_column_width=True)
+    if cols[i].button("Choose", key=filename):
+        selected_sample = img_path
+
+if uploaded_file is None and selected_sample is not None:
+    with open(selected_sample, "rb") as f:
+        uploaded_file = io.BytesIO(f.read())
+
+# Prediction
+if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-
-if image is not None:
     st.image(image, caption="Input Image", use_column_width=True)
 
     img_tensor = transform(image).unsqueeze(0)
@@ -65,5 +69,5 @@ if image is not None:
         confidence = confidence.item()
         result = class_map[predicted_class]
 
-    st.markdown(f"### Prediction: **{result}**")
+    st.markdown(f"### 🎯 Prediction: **{result}**")
     st.markdown(f"Confidence: **{confidence * 100:.2f}%**")
