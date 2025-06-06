@@ -55,7 +55,7 @@ if uploaded_file is None and selected_sample is not None:
 # Prediction
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Input Image", use_container_width=True)
+    st.image(image, use_container_width=True)
 
     img_tensor = transform(image).unsqueeze(0)
 
