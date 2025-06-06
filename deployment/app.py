@@ -32,7 +32,7 @@ transform = transforms.Compose([
 st.title("Fish Classifier: Salmon or Trout?")
 st.markdown("Upload your own image **or** select one of our sample images below.")
 
-sample_dir = "deployment/sample_images"
+sample_dir = os.path.join("deployment", "sample_images")
 sample_filenames = ["salmon_1.jpg", "salmon_2.jpg", "trout_1.jpg", "trout_2.jpg"]
 random.shuffle(sample_filenames)
 
