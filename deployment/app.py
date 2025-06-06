@@ -46,7 +46,7 @@ cols = st.columns(len(sample_filenames))
 for i, filename in enumerate(sample_filenames):
     img_path = os.path.join(sample_dir, filename)
     image = Image.open(img_path)
-    cols[i].image(image, use_column_width=True)
+    cols[i].image(image, use_container_width=True)
     if cols[i].button("Choose", key=filename):
         selected_sample = img_path
 
