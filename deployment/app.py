@@ -41,10 +41,9 @@ st.markdown("### Sample Images:")
 selected_sample = None
 cols = st.columns(len(sample_filenames))
 
-# Show sample images with same size and buttons
 for i, filename in enumerate(sample_filenames):
     img_path = os.path.join(sample_dir, filename)
-    image = Image.open(img_path).convert("RGB").resize((150, 150))  # resize for uniform display
+    image = Image.open(img_path).convert("RGB").resize((150, 150))
     cols[i].image(image, use_container_width=True)
     if cols[i].button("Choose", key=filename):
         selected_sample = img_path
