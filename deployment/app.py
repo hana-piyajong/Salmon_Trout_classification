@@ -32,22 +32,30 @@ transform = transforms.Compose([
 st.title("Fish Classifier: Salmon or Trout?")
 st.markdown("Upload your own image **or** select one of our sample images below.")
 
-sample_dir = "deployment\sample_images"
+sample_dir = "deployment/sample_images"
 sample_filenames = ["salmon_1.jpg", "salmon_2.jpg", "trout_1.jpg", "trout_2.jpg"]
 random.shuffle(sample_filenames)
 
-selected_sample = st.selectbox("Choose a sample image (optional):", ["None"] + sample_filenames, format_func=lambda x: "Sample Image" if x != "None" else "None")
+selected_sample = st.selectbox(
+    "Choose a sample image (optional):",
+    ["None"] + sample_filenames,
+    format_func=lambda x: x if x == "None" else f"Sample: {x}"
+)
 
 uploaded_file = st.file_uploader("Upload a fish image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file is None and selected_sample != "None":
-    uploaded_file = open(os.path.join(sample_dir, selected_sample), "rb")
+image = None
 
-if uploaded_file is not None:
+if uploaded_file is None and selected_sample != "None":
+    image_path = os.path.join(sample_dir, selected_sample)
+    image = Image.open(image_path).convert("RGB")
+elif uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
+
+if image is not None:
     st.image(image, caption="Input Image", use_column_width=True)
 
-    img_tensor = transform(image).unsqueeze(0)  # Add batch dim
+    img_tensor = transform(image).unsqueeze(0)
 
     with torch.no_grad():
         outputs = model(img_tensor)
@@ -57,5 +65,5 @@ if uploaded_file is not None:
         confidence = confidence.item()
         result = class_map[predicted_class]
 
-    st.markdown(f"### Prediction: **{result}** ({predicted_class})")
+    st.markdown(f"### Prediction: **{result}**")
     st.markdown(f"Confidence: **{confidence * 100:.2f}%**")
