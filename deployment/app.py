@@ -57,7 +57,7 @@ if uploaded_file is None and selected_sample is not None:
 # Prediction
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Input Image", use_column_width=True)
+    st.image(image, caption="Input Image", use_container_width=True)
 
     img_tensor = transform(image).unsqueeze(0)
 
@@ -69,5 +69,5 @@ if uploaded_file is not None:
         confidence = confidence.item()
         result = class_map[predicted_class]
 
-    st.markdown(f"### 🎯 Prediction: **{result}**")
+    st.markdown(f"### Prediction: **{result}**")
     st.markdown(f"Confidence: **{confidence * 100:.2f}%**")
